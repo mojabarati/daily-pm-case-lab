@@ -1,0 +1,6 @@
+{"id":"spoiler_boundary","description":"Challenge must not contain distinctive actual-decision terms","expected":"reject_when_spoiled"}
+{"id":"grounding","description":"Every FACT source ID resolves to a structured source","expected":"reject_when_unresolved"}
+{"id":"analytical_depth","description":"Case includes alternatives, trade-offs, metrics, guardrails, risks and validation","expected":"required"}
+{"id":"source_quality","description":"At least five unique sources, two categories and primary evidence or an explicit gap","expected":"required"}
+{"id":"duplicate_history","description":"Exact and high-similarity same-company cases do not publish","expected":"reject"}
+
