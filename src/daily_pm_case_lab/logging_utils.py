@@ -6,7 +6,10 @@ import re
 from datetime import UTC, datetime
 from typing import Any
 
-SECRET_KEY_RE = re.compile(r"(api[_-]?key|authorization|token|secret|password)", re.IGNORECASE)
+SECRET_KEY_RE = re.compile(
+    r"(api[_-]?key|authorization|access[_-]?token|github[_-]?token|gh[_-]?token|secret|password)",
+    re.IGNORECASE,
+)
 SECRET_VALUE_RE = re.compile(r"\bsk-[A-Za-z0-9_-]{12,}\b")
 
 

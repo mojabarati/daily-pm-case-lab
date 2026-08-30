@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 import uuid
 from datetime import date
@@ -7,8 +8,10 @@ from datetime import date
 from .catalog import load_catalog, resolve_company
 from .config import Settings
 from .delivery import GitHubIssueDelivery
+from .evidence import canonicalize_source_ids
 from .gateway import AgentBudgetExceeded, AgentGateway, OpenAIAgentGateway
 from .history import append_history, duplicate_reason, load_history
+from .logging_utils import redact
 from .models import GenerationResult, HistoryRecord, ResearchPacket
 from .publisher import publish_case
 from .quality import evaluate_quality
@@ -23,6 +26,24 @@ class DailyCaseOrchestrator:
         self.settings = settings
         self.run_id = uuid.uuid4().hex
         self.gateway = gateway or OpenAIAgentGateway(settings, self.run_id)
+
+    def _retain_failed_diagnostic(self, candidate_slug, packet, study, quality) -> str | None:
+        if not self.settings.retain_failed:
+            return None
+        diagnostics_dir = self.settings.root_dir / "logs" / "failed"
+        diagnostics_dir.mkdir(parents=True, exist_ok=True)
+        path = diagnostics_dir / f"{self.run_id}-{candidate_slug}.json"
+        payload = redact(
+            {
+                "run_id": self.run_id,
+                "model": self.settings.openai_model,
+                "research_packet": packet.model_dump(mode="json"),
+                "case_study": study.model_dump(mode="json"),
+                "quality_report": quality.model_dump(mode="json"),
+            }
+        )
+        path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        return str(path)
 
     async def generate(
         self,
@@ -71,6 +92,10 @@ class DailyCaseOrchestrator:
         candidates.sort(key=lambda candidate: candidate.score.total, reverse=True)
         candidates = candidates[: self.settings.max_case_candidates]
         attempted = 0
+        last_quality_score: int | None = None
+        last_company: str | None = None
+        last_blockers: list[str] = []
+        last_diagnostic: str | None = None
 
         for candidate in candidates:
             attempted += 1
@@ -101,6 +126,19 @@ class DailyCaseOrchestrator:
                         },
                     )
                     break
+                try:
+                    packet = canonicalize_source_ids(packet)
+                except ValueError as exc:
+                    LOGGER.warning(
+                        "research packet evidence integrity failed: %s",
+                        str(exc),
+                        extra={
+                            "run_id": self.run_id,
+                            "stage": "research-validation",
+                            "status": "rejected",
+                        },
+                    )
+                    continue
                 score = researched_score(candidate, packet)
                 packet.candidate = with_score(candidate, score)
                 if score.total > best_total:
@@ -138,8 +176,15 @@ class DailyCaseOrchestrator:
                 history=history,
             )
             if not quality.publishable:
+                last_quality_score = quality.score
+                last_company = candidate.company_name
+                last_blockers = quality.blockers
+                last_diagnostic = self._retain_failed_diagnostic(
+                    candidate.case_slug, best_packet, study, quality
+                )
                 LOGGER.warning(
-                    "candidate failed quality gate",
+                    "candidate failed quality gate: %s",
+                    "; ".join(quality.blockers[:5]),
                     extra={
                         "run_id": self.run_id,
                         "stage": "quality-gate",
@@ -190,7 +235,13 @@ class DailyCaseOrchestrator:
 
         return GenerationResult(
             status="no_publishable_candidate",
+            quality_score=last_quality_score,
+            selected_company=last_company,
             attempted_candidates=attempted,
             agent_runs=self.gateway.runs_used,
-            message="No candidate reached the 75/100 quality threshold and all hard checks.",
+            diagnostic_file=last_diagnostic,
+            message=(
+                "No candidate reached the 75/100 quality threshold and all hard checks. "
+                + ("Top blockers: " + "; ".join(last_blockers[:5]) if last_blockers else "")
+            ).strip(),
         )

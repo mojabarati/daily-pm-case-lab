@@ -57,6 +57,7 @@ Configuration:
 | `MAX_SOURCES` | `12` | Maximum sources returned in a packet |
 | `MAX_AGENT_RUNS` | `12` | Absolute SDK-call budget per command |
 | `PM_CASE_LOG_LEVEL` | `INFO` | structured-log level |
+| `PM_CASE_RETAIN_FAILED` | `false` | retain an ignored local diagnostic for rejected drafts |
 | `PM_CASE_GITHUB_REPOSITORY` | unset | `owner/repo` for Issue delivery |
 
 The application does not contain token prices. Usage, tool calls, duration, and stage outcome are
@@ -171,4 +172,3 @@ Evidence-driven extensions include independent URL/content verification, RSS and
 adapters, human approval, semantic duplicate embeddings, platform trace graders, cost dashboards, and
 additional output languages. A frontend, database, queue, paid search, and scraping remain intentionally
 out of scope.
-

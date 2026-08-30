@@ -5,7 +5,7 @@ from datetime import datetime as DateTime
 from enum import StrEnum
 from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class StrictModel(BaseModel):
@@ -58,15 +58,32 @@ class Source(StrictModel):
     author: str | None = None
     speaker: str | None = None
     speaker_role: str | None = None
-    url: HttpUrl
-    published_at: Date | None = None
-    accessed_at: Date
+    url: str
+    published_at: str | None = None
+    accessed_at: str
     is_primary: bool = False
     content_access_level: ContentAccessLevel
     credibility_score: int = Field(ge=0, le=100)
     relevant_sections: list[str] = Field(default_factory=list)
     timestamps: list[str] = Field(default_factory=list)
     used_for: list[str] = Field(default_factory=list)
+
+    @field_validator("url")
+    @classmethod
+    def validate_http_url(cls, value: str) -> str:
+        from urllib.parse import urlsplit
+
+        parsed = urlsplit(value)
+        if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+            raise ValueError("Source URL must be an absolute HTTP(S) URL")
+        return value
+
+    @field_validator("published_at", "accessed_at")
+    @classmethod
+    def validate_iso_date(cls, value: str | None) -> str | None:
+        if value is not None:
+            Date.fromisoformat(value)
+        return value
 
 
 class Claim(StrictModel):
@@ -85,11 +102,18 @@ class Claim(StrictModel):
 class PersonStatement(StrictModel):
     person: str
     role_at_time: str
-    date: Date | None = None
+    date: str | None = None
     context: str
     statement_or_paraphrase: str
     source_id: str
     is_direct_quote: bool = False
+
+    @field_validator("date")
+    @classmethod
+    def validate_iso_date(cls, value: str | None) -> str | None:
+        if value is not None:
+            Date.fromisoformat(value)
+        return value
 
 
 class CandidateScore(StrictModel):
@@ -222,6 +246,7 @@ class GenerationResult(StrictModel):
     attempted_candidates: int = 0
     agent_runs: int = 0
     issue_url: str | None = None
+    diagnostic_file: str | None = None
     message: str
 
 

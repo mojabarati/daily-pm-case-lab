@@ -71,8 +71,9 @@ Use WebSearchTool broadly but return no more than {max_sources} distinct meaning
 for the actual problem signals, constraints, actors, chronology, the company's eventual decision,
 rollout, product-relevant operational/technical changes, and measurable outcomes. Include market and
 competitor context only when sourced. Capture "Who Said What" statements with role at the time and
-context. The `decision_terms` list must contain distinctive phrases that would reveal the real
-solution or outcome if they appeared in the learner challenge.
+context. The `decision_terms` list must contain only distinctive solution, rollout, or outcome phrases
+that would reveal the answer. Exclude company/product names, the stated problem, actors, and terms
+needed to explain the pre-decision context.
 
 On later passes, close evidence gaps rather than merely repeating the same URLs. Prior pass summary:
 {prior}
@@ -127,6 +128,11 @@ evidence packet. Identify unsupported factual claims, invented specificity, misl
 spoilers in overview/challenge, shallow trade-off analysis, hindsight criticism, missing alternatives,
 and weak metrics/guardrails. A blocker means the case must not publish. Score conservatively from
 0-100; 75 is the minimum but never pass a blocker merely because the numeric score is high.
+
+The package is intentionally two-phase. Only `overview_markdown` and `challenge_markdown` must hide
+the actual decision, implementation, and outcome. Documents 02-06 are explicitly post-challenge and
+must contain evidence, the real company response, critique, and model answer; do not flag their
+required answer-revealing content as a spoiler.
 
 Evidence packet:
 {packet.model_dump_json(indent=2)}

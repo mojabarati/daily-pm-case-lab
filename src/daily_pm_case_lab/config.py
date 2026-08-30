@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     max_sources: int = Field(default=12, ge=5, le=20, alias="MAX_SOURCES")
     max_agent_runs: int = Field(default=12, ge=3, le=30, alias="MAX_AGENT_RUNS")
     log_level: str = Field(default="INFO", alias="PM_CASE_LOG_LEVEL")
+    retain_failed: bool = Field(default=False, alias="PM_CASE_RETAIN_FAILED")
     github_repository: str | None = Field(default=None, alias="PM_CASE_GITHUB_REPOSITORY")
     root_dir: Path = Field(default_factory=Path.cwd)
 

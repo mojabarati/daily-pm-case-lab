@@ -19,10 +19,15 @@ def test_settings_enforce_bounded_limits(tmp_path) -> None:
 
 
 def test_recursive_redaction_removes_secret_values() -> None:
-    payload = {"OPENAI_API_KEY": "not-for-output", "message": "value sk-testSecret123456"}
+    payload = {
+        "OPENAI_API_KEY": "not-for-output",
+        "message": "value sk-testSecret123456",
+        "input_tokens": 42,
+    }
     sanitized = redact(payload)
     assert sanitized["OPENAI_API_KEY"] == "[REDACTED]"
     assert "sk-" not in sanitized["message"]
+    assert sanitized["input_tokens"] == 42
 
 
 def test_github_delivery_uses_argument_list_and_returns_url(monkeypatch, tmp_path) -> None:

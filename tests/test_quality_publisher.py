@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from datetime import date
 
+from daily_pm_case_lab.evidence import canonicalize_source_ids
 from daily_pm_case_lab.publisher import publish_case
 from daily_pm_case_lab.quality import REQUIRED_FILES, evaluate_quality, validate_case_directory
 
@@ -38,6 +39,25 @@ def test_quality_gate_rejects_spoiler() -> None:
     assert any(
         check.name == "spoiler_free_challenge" and not check.passed for check in report.checks
     )
+
+
+def test_canonicalizes_positional_and_repeated_digit_source_ids() -> None:
+    research = packet()
+    for index, source in enumerate(research.sources, start=1):
+        source.id = f"S{index}{index}"
+    research.claims[0].source_ids = ["S1", "S2"]
+    research.timeline[0].source_ids = ["S11"]
+    research.actual_decision[0].source_ids = ["S1"]
+    normalized = canonicalize_source_ids(research)
+    assert [source.id for source in normalized.sources] == [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+    ]
+    assert normalized.claims[0].source_ids == ["S01", "S02"]
+    assert normalized.timeline[0].source_ids == ["S01"]
 
 
 def test_atomic_publisher_writes_exact_file_set(tmp_path) -> None:

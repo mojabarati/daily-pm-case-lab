@@ -80,8 +80,25 @@ def evaluate_quality(
         referenced_ids.update(event.source_ids)
 
     duplicate = duplicate_reason(packet.candidate, history)
+    candidate_context = normalized_tokens(
+        " ".join(
+            [
+                packet.candidate.company_name,
+                packet.candidate.case_title,
+                packet.candidate.primary_problem,
+                packet.candidate.product,
+                packet.candidate.case_category,
+            ]
+        )
+    )
+    distinctive_decision_terms = [
+        term
+        for term in packet.decision_terms
+        if not normalized_tokens(term) <= candidate_context
+    ]
     spoiler_matches = contains_spoiler(
-        f"{study.overview_markdown}\n{study.challenge_markdown}", packet.decision_terms
+        f"{study.overview_markdown}\n{study.challenge_markdown}",
+        distinctive_decision_terms,
     )
     all_markdown = _all_markdown(study)
     checks = [
