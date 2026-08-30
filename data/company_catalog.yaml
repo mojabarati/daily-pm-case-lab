@@ -1,0 +1,101 @@
+- {id: google, name: Google, aliases: [Alphabet], category: Consumer / Big Tech, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: microsoft, name: Microsoft, aliases: [], category: Consumer / Big Tech, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: apple, name: Apple, aliases: [], category: Consumer / Big Tech, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: amazon, name: Amazon, aliases: [], category: Consumer / Big Tech, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: meta, name: Meta, aliases: [Facebook], category: Consumer / Big Tech, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: netflix, name: Netflix, aliases: [], category: Consumer / Big Tech, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: spotify, name: Spotify, aliases: [], category: Consumer / Big Tech, country: Sweden, public_company: true, research_priority: high, case_count: 0}
+- {id: reddit, name: Reddit, aliases: [], category: Consumer / Big Tech, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: snap, name: Snap, aliases: [Snapchat], category: Consumer / Big Tech, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: pinterest, name: Pinterest, aliases: [], category: Consumer / Big Tech, country: United States, public_company: true, research_priority: medium, case_count: 0}
+- {id: tiktok, name: ByteDance / TikTok, aliases: [ByteDance, TikTok], category: Consumer / Big Tech, country: China, public_company: false, research_priority: high, case_count: 0}
+- {id: linkedin, name: LinkedIn, aliases: [], category: Consumer / Big Tech, country: United States, public_company: false, research_priority: high, case_count: 0}
+- {id: uber, name: Uber, aliases: [], category: Marketplaces / On-demand, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: lyft, name: Lyft, aliases: [], category: Marketplaces / On-demand, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: doordash, name: DoorDash, aliases: [], category: Marketplaces / On-demand, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: airbnb, name: Airbnb, aliases: [], category: Marketplaces / On-demand, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: booking-holdings, name: Booking Holdings, aliases: [Booking.com], category: Marketplaces / On-demand, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: expedia, name: Expedia, aliases: [Expedia Group], category: Marketplaces / On-demand, country: United States, public_company: true, research_priority: medium, case_count: 0}
+- {id: instacart, name: Instacart, aliases: [Maplebear], category: Marketplaces / On-demand, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: deliveroo, name: Deliveroo, aliases: [], category: Marketplaces / On-demand, country: United Kingdom, public_company: true, research_priority: medium, case_count: 0}
+- {id: grab, name: Grab, aliases: [], category: Marketplaces / On-demand, country: Singapore, public_company: true, research_priority: high, case_count: 0}
+- {id: meituan, name: Meituan, aliases: [], category: Marketplaces / On-demand, country: China, public_company: true, research_priority: medium, case_count: 0}
+- {id: swiggy, name: Swiggy, aliases: [], category: Marketplaces / On-demand, country: India, public_company: true, research_priority: medium, case_count: 0}
+- {id: eternal, name: Zomato / Eternal, aliases: [Zomato, Eternal], category: Marketplaces / On-demand, country: India, public_company: true, research_priority: high, case_count: 0}
+- {id: mercado-libre, name: Mercado Libre, aliases: [MercadoLibre], category: Marketplaces / On-demand, country: Argentina, public_company: true, research_priority: high, case_count: 0}
+- {id: coupang, name: Coupang, aliases: [], category: Marketplaces / On-demand, country: South Korea, public_company: true, research_priority: medium, case_count: 0}
+- {id: ebay, name: eBay, aliases: [], category: Marketplaces / On-demand, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: etsy, name: Etsy, aliases: [], category: Marketplaces / On-demand, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: shopify, name: Shopify, aliases: [], category: Commerce, country: Canada, public_company: true, research_priority: high, case_count: 0}
+- {id: walmart, name: Walmart, aliases: [], category: Commerce, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: wayfair, name: Wayfair, aliases: [], category: Commerce, country: United States, public_company: true, research_priority: medium, case_count: 0}
+- {id: alibaba, name: Alibaba, aliases: [], category: Commerce, country: China, public_company: true, research_priority: high, case_count: 0}
+- {id: jd-com, name: JD.com, aliases: [JD], category: Commerce, country: China, public_company: true, research_priority: medium, case_count: 0}
+- {id: rakuten, name: Rakuten, aliases: [], category: Commerce, country: Japan, public_company: true, research_priority: medium, case_count: 0}
+- {id: sea, name: Sea / Shopee, aliases: [Sea, Shopee], category: Commerce, country: Singapore, public_company: true, research_priority: high, case_count: 0}
+- {id: stripe, name: Stripe, aliases: [], category: Fintech, country: United States, public_company: false, research_priority: high, case_count: 0}
+- {id: block, name: Block, aliases: [Square], category: Fintech, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: paypal, name: PayPal, aliases: [], category: Fintech, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: adyen, name: Adyen, aliases: [], category: Fintech, country: Netherlands, public_company: true, research_priority: high, case_count: 0}
+- {id: klarna, name: Klarna, aliases: [], category: Fintech, country: Sweden, public_company: false, research_priority: high, case_count: 0}
+- {id: revolut, name: Revolut, aliases: [], category: Fintech, country: United Kingdom, public_company: false, research_priority: high, case_count: 0}
+- {id: wise, name: Wise, aliases: [TransferWise], category: Fintech, country: United Kingdom, public_company: true, research_priority: high, case_count: 0}
+- {id: nubank, name: Nubank, aliases: [Nu Holdings], category: Fintech, country: Brazil, public_company: true, research_priority: high, case_count: 0}
+- {id: coinbase, name: Coinbase, aliases: [], category: Fintech, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: robinhood, name: Robinhood, aliases: [], category: Fintech, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: plaid, name: Plaid, aliases: [], category: Fintech, country: United States, public_company: false, research_priority: high, case_count: 0}
+- {id: salesforce, name: Salesforce, aliases: [], category: SaaS / Enterprise, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: servicenow, name: ServiceNow, aliases: [], category: SaaS / Enterprise, country: United States, public_company: true, research_priority: medium, case_count: 0}
+- {id: adobe, name: Adobe, aliases: [], category: SaaS / Enterprise, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: atlassian, name: Atlassian, aliases: [], category: SaaS / Enterprise, country: Australia, public_company: true, research_priority: high, case_count: 0}
+- {id: hubspot, name: HubSpot, aliases: [], category: SaaS / Enterprise, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: zoom, name: Zoom, aliases: [Zoom Video Communications], category: SaaS / Enterprise, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: dropbox, name: Dropbox, aliases: [], category: SaaS / Enterprise, country: United States, public_company: true, research_priority: medium, case_count: 0}
+- {id: box, name: Box, aliases: [], category: SaaS / Enterprise, country: United States, public_company: true, research_priority: medium, case_count: 0}
+- {id: docusign, name: DocuSign, aliases: [], category: SaaS / Enterprise, country: United States, public_company: true, research_priority: medium, case_count: 0}
+- {id: intuit, name: Intuit, aliases: [], category: SaaS / Enterprise, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: sap, name: SAP, aliases: [], category: SaaS / Enterprise, country: Germany, public_company: true, research_priority: medium, case_count: 0}
+- {id: oracle, name: Oracle, aliases: [], category: SaaS / Enterprise, country: United States, public_company: true, research_priority: medium, case_count: 0}
+- {id: github, name: GitHub, aliases: [], category: Developer / Infrastructure, country: United States, public_company: false, research_priority: high, case_count: 0}
+- {id: gitlab, name: GitLab, aliases: [], category: Developer / Infrastructure, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: docker, name: Docker, aliases: [], category: Developer / Infrastructure, country: United States, public_company: false, research_priority: high, case_count: 0}
+- {id: cloudflare, name: Cloudflare, aliases: [], category: Developer / Infrastructure, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: datadog, name: Datadog, aliases: [], category: Developer / Infrastructure, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: snowflake, name: Snowflake, aliases: [], category: Developer / Infrastructure, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: mongodb, name: MongoDB, aliases: [], category: Developer / Infrastructure, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: twilio, name: Twilio, aliases: [], category: Developer / Infrastructure, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: okta, name: Okta, aliases: [], category: Developer / Infrastructure, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: hashicorp, name: HashiCorp, aliases: [], category: Developer / Infrastructure, country: United States, public_company: false, research_priority: high, case_count: 0}
+- {id: openai, name: OpenAI, aliases: [], category: AI / Data, country: United States, public_company: false, research_priority: high, case_count: 0}
+- {id: anthropic, name: Anthropic, aliases: [], category: AI / Data, country: United States, public_company: false, research_priority: high, case_count: 0}
+- {id: databricks, name: Databricks, aliases: [], category: AI / Data, country: United States, public_company: false, research_priority: high, case_count: 0}
+- {id: scale-ai, name: Scale AI, aliases: [], category: AI / Data, country: United States, public_company: false, research_priority: high, case_count: 0}
+- {id: perplexity, name: Perplexity, aliases: [Perplexity AI], category: AI / Data, country: United States, public_company: false, research_priority: high, case_count: 0}
+- {id: mistral-ai, name: Mistral AI, aliases: [Mistral], category: AI / Data, country: France, public_company: false, research_priority: high, case_count: 0}
+- {id: figma, name: Figma, aliases: [], category: Design / Productivity, country: United States, public_company: false, research_priority: high, case_count: 0}
+- {id: canva, name: Canva, aliases: [], category: Design / Productivity, country: Australia, public_company: false, research_priority: high, case_count: 0}
+- {id: notion, name: Notion, aliases: [], category: Design / Productivity, country: United States, public_company: false, research_priority: high, case_count: 0}
+- {id: nvidia, name: NVIDIA, aliases: [], category: Hardware / Semiconductor, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: amd, name: AMD, aliases: [Advanced Micro Devices], category: Hardware / Semiconductor, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: intel, name: Intel, aliases: [], category: Hardware / Semiconductor, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: qualcomm, name: Qualcomm, aliases: [], category: Hardware / Semiconductor, country: United States, public_company: true, research_priority: medium, case_count: 0}
+- {id: arm, name: Arm, aliases: [Arm Holdings], category: Hardware / Semiconductor, country: United Kingdom, public_company: true, research_priority: high, case_count: 0}
+- {id: samsung, name: Samsung, aliases: [Samsung Electronics], category: Hardware / Semiconductor, country: South Korea, public_company: true, research_priority: high, case_count: 0}
+- {id: cisco, name: Cisco, aliases: [], category: Hardware / Semiconductor, country: United States, public_company: true, research_priority: medium, case_count: 0}
+- {id: tesla, name: Tesla, aliases: [], category: Mobility / Deep Tech, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: spacex, name: SpaceX, aliases: [], category: Mobility / Deep Tech, country: United States, public_company: false, research_priority: medium, case_count: 0}
+- {id: palantir, name: Palantir, aliases: [], category: Other significant technology, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: xiaomi, name: Xiaomi, aliases: [], category: Other significant technology, country: China, public_company: true, research_priority: medium, case_count: 0}
+- {id: baidu, name: Baidu, aliases: [], category: Other significant technology, country: China, public_company: true, research_priority: high, case_count: 0}
+- {id: tencent, name: Tencent, aliases: [], category: Other significant technology, country: China, public_company: true, research_priority: high, case_count: 0}
+- {id: didi, name: DiDi, aliases: [Didi Chuxing], category: Marketplaces / On-demand, country: China, public_company: true, research_priority: medium, case_count: 0}
+- {id: ola, name: Ola, aliases: [Ola Cabs], category: Marketplaces / On-demand, country: India, public_company: false, research_priority: medium, case_count: 0}
+- {id: gojek, name: Gojek, aliases: [GoTo], category: Marketplaces / On-demand, country: Indonesia, public_company: true, research_priority: medium, case_count: 0}
+- {id: workday, name: Workday, aliases: [], category: SaaS / Enterprise, country: United States, public_company: true, research_priority: medium, case_count: 0}
+- {id: crowdstrike, name: CrowdStrike, aliases: [], category: Security, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: palo-alto-networks, name: Palo Alto Networks, aliases: [], category: Security, country: United States, public_company: true, research_priority: medium, case_count: 0}
+- {id: unity, name: Unity, aliases: [Unity Technologies], category: Gaming, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: roblox, name: Roblox, aliases: [], category: Gaming, country: United States, public_company: true, research_priority: high, case_count: 0}
+- {id: epic-games, name: Epic Games, aliases: [Epic], category: Gaming, country: United States, public_company: false, research_priority: high, case_count: 0}
+- {id: duolingo, name: Duolingo, aliases: [], category: Education, country: United States, public_company: true, research_priority: high, case_count: 0}
+

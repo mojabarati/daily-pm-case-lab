@@ -1,0 +1,47 @@
+[project]
+name = "daily-pm-case-lab"
+version = "0.1.0"
+description = "An evidence-grounded daily product and business case-study generator"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "openai-agents>=0.6,<1",
+  "pydantic>=2.11,<3",
+  "pydantic-settings>=2.10,<3",
+  "python-dotenv>=1.1,<2",
+  "pyyaml>=6.0.2,<7",
+  "tzdata>=2025.2",
+]
+
+[project.scripts]
+pm-case-lab = "daily_pm_case_lab.cli:main"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.4,<9",
+  "pytest-asyncio>=1.1,<2",
+  "ruff>=0.12,<1",
+]
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/daily_pm_case_lab"]
+
+[tool.pytest.ini_options]
+addopts = "-q --basetemp=.pytest-tmp"
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "RUF", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/daily_pm_case_lab/prompts.py" = ["E501"]
+"tests/factories.py" = ["E501", "RUF001"]
