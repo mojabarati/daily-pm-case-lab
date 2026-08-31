@@ -123,12 +123,12 @@ missing primary evidence without an explicit evidence gap, duplicate history, sp
 challenge, missing analytical sections, or API-key-like content. Exhausting candidates or the call
 budget exits non-zero without mutating history.
 
-## GitHub Actions scheduler
+## Manual GitHub Actions execution
 
-`.github/workflows/daily-case.yml` supports manual dispatch and uses `30 8 * * *`, which is 12:00 in
-`Asia/Tehran` under the current UTC+03:30 civil-time rule. GitHub cron is UTC; if Iran's timezone law
-changes, update the expression. Scheduled workflows can be delayed by GitHub load, so 12:00 is a
-target rather than a real-time guarantee.
+`.github/workflows/daily-case.yml` runs only when manually dispatched from **GitHub → Actions →
+Daily PM Case Lab → Run workflow**. Leave the optional `company` input empty for automatic catalog
+selection, or enter a catalog company ID, name, or alias to target a company. No automatic schedule is
+configured.
 
 Repository settings required:
 
@@ -162,7 +162,7 @@ outside the MVP.
   publish an evidence gap or reject the candidate.
 - GitHub Issues are notifications, not a transactional delivery queue. A post-publication delivery
   failure leaves the generated case intact and returns a failure for explicit retry.
-- The fixed UTC cron must be reviewed after any Iranian civil-time change.
+- GitHub Actions generation is manual-only; no case is generated until a user runs the workflow.
 
 See [the architecture contract](docs/architecture.md) for the full state machine and design rationale.
 

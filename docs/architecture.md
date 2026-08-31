@@ -6,7 +6,7 @@ Business timezone: `Asia/Tehran`
 
 ## Product contract
 
-Daily PM Case Lab creates one evidence-backed Persian product/business case study per day. It is a deliberate-practice system, not a content aggregator: the learner first receives a spoiler-free challenge, then an evidence pack, the company's observed response, senior-PM analysis, a model answer, and an interview drill.
+Daily PM Case Lab creates one evidence-backed Persian product/business case study per successful manual run. It is a deliberate-practice system, not a content aggregator: the learner first receives a spoiler-free challenge, then an evidence pack, the company's observed response, senior-PM analysis, a model answer, and an interview drill.
 
 Success means that a published case:
 
@@ -192,11 +192,9 @@ CLI commands:
 
 `GitHubIssueDelivery` uses GitHub's CLI with `GITHUB_TOKEN`/Actions permissions and an explicit repository. It sends only a concise case summary and repository-relative links; it never includes credentials or large generated content.
 
-## Scheduler
+## Manual GitHub Actions execution
 
-GitHub Actions runs at `30 8 * * *` UTC, corresponding to 12:00 `Asia/Tehran` under Iran's current UTC+03:30 civil time, and supports `workflow_dispatch`. Workflow concurrency is one non-cancelling daily run. The workflow installs `uv`, syncs the locked environment, runs the generator, commits only generated case/history changes, pushes, and creates the optional Issue using the repository token.
-
-Because GitHub cron is UTC and timezone law can change, the README documents the conversion and the owner must revisit the cron if Iran's civil-time rules change.
+GitHub Actions runs only through `workflow_dispatch`. The optional `company` input accepts a catalog company ID, name, or alias; when it is empty, the application performs its normal automatic catalog selection. Workflow concurrency permits one non-cancelling run at a time. The workflow installs `uv`, syncs the locked environment, runs the generator, commits only generated case/history changes, pushes, and creates the optional Issue using the repository token.
 
 ## Verification strategy
 

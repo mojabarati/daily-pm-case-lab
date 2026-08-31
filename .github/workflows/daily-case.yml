@@ -1,9 +1,6 @@
 name: Daily PM Case Lab
 
 on:
-  schedule:
-    # 12:00 Asia/Tehran under the current UTC+03:30 civil-time rule.
-    - cron: "30 8 * * *"
   workflow_dispatch:
     inputs:
       company:
