@@ -31,7 +31,7 @@ build-backend = "hatchling.build"
 packages = ["src/daily_pm_case_lab"]
 
 [tool.pytest.ini_options]
-addopts = "-q --basetemp=.pytest-tmp"
+addopts = "-q"
 testpaths = ["tests"]
 asyncio_mode = "auto"
 
