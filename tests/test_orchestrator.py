@@ -57,13 +57,21 @@ async def test_offline_full_orchestration_publishes_and_updates_history(tmp_path
         max_agent_runs=4,
     )
     gateway = FakeGateway()
+    progress = []
     result = await DailyCaseOrchestrator(settings, gateway).generate(
-        run_date=date(2026, 8, 30), company_override="Uber"
+        run_date=date(2026, 8, 30),
+        company_override="Uber",
+        progress_callback=progress.append,
     )
     assert result.status == "published"
     assert result.quality_score >= 75
     assert Path(result.case_directory or "").exists()
     assert len((data_dir / "history.jsonl").read_text(encoding="utf-8").splitlines()) == 1
+    events = [item.event for item in progress]
+    assert events.index("company.selection.completed") < events.index("candidate.selection.started")
+    assert events.index("research.started") < events.index("research.completed")
+    assert events.index("quality.validation.completed") < events.index("publishing.started")
+    assert events[-1] == "history.update.completed"
 
 
 @pytest.mark.asyncio

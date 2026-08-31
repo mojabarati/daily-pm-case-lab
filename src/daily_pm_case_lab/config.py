@@ -23,6 +23,12 @@ class Settings(BaseSettings):
     max_research_passes: int = Field(default=3, ge=1, le=5, alias="MAX_RESEARCH_PASSES")
     max_sources: int = Field(default=12, ge=5, le=20, alias="MAX_SOURCES")
     max_agent_runs: int = Field(default=12, ge=3, le=30, alias="MAX_AGENT_RUNS")
+    model_timeout_seconds: float = Field(
+        default=600, ge=30, le=1800, alias="OPENAI_MODEL_TIMEOUT_SECONDS"
+    )
+    generation_timeout_seconds: float = Field(
+        default=2700, ge=300, le=7200, alias="GENERATION_TIMEOUT_SECONDS"
+    )
     log_level: str = Field(default="INFO", alias="PM_CASE_LOG_LEVEL")
     retain_failed: bool = Field(default=False, alias="PM_CASE_RETAIN_FAILED")
     github_repository: str | None = Field(default=None, alias="PM_CASE_GITHUB_REPOSITORY")

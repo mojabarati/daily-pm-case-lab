@@ -1,8 +1,9 @@
 # Daily PM Case Lab
 
-Daily PM Case Lab is a CLI-first learning system that researches and publishes one Persian
-product/business case study per day. It is designed to improve Product Sense, problem framing,
-strategy, metrics, trade-off analysis, and decision-making through real technology-company cases.
+Daily PM Case Lab is a local-first learning system with a Streamlit web UI and CLI. It researches
+and publishes Persian product/business case studies designed to improve Product Sense, problem
+framing, strategy, metrics, trade-off analysis, and decision-making through real technology-company
+cases.
 
 The MVP uses deterministic Python orchestration around a small number of typed OpenAI Agents SDK
 calls. The scout and researcher use OpenAI's hosted `WebSearchTool`; synthesis and critical review
@@ -56,12 +57,53 @@ Configuration:
 | `MAX_RESEARCH_PASSES` | `3` | Research retries per candidate |
 | `MAX_SOURCES` | `12` | Maximum sources returned in a packet |
 | `MAX_AGENT_RUNS` | `12` | Absolute SDK-call budget per command |
+| `OPENAI_MODEL_TIMEOUT_SECONDS` | `600` | Maximum time for one Agents SDK model attempt |
+| `GENERATION_TIMEOUT_SECONDS` | `2700` | Maximum end-to-end UI generation time |
 | `PM_CASE_LOG_LEVEL` | `INFO` | structured-log level |
 | `PM_CASE_RETAIN_FAILED` | `false` | retain an ignored local diagnostic for rejected drafts |
 | `PM_CASE_GITHUB_REPOSITORY` | unset | `owner/repo` for Issue delivery |
 
 The application does not contain token prices. Usage, tool calls, duration, and stage outcome are
 logged as sanitized JSON when exposed by the SDK.
+
+## Web UI
+
+Install the locked environment and configure the ignored `.env.local` file as described above, then
+start the local UI from the repository root:
+
+```powershell
+uv run pm-case-ui
+```
+
+The equivalent direct command is:
+
+```powershell
+uv run streamlit run src/daily_pm_case_lab/ui/app.py
+```
+
+Open [http://localhost:8501](http://localhost:8501) if the browser does not open automatically.
+The sidebar provides Dashboard, Generate Case, Case Library, Companies, Validation, History, and
+Settings / System Status.
+
+On **Generate Case**, leave **Automatic Selection** enabled or choose a searchable catalog company,
+select the Tehran run date, and choose either normal generation or **Dry Run**. Dry Run calls the
+existing deterministic selection path without agent calls or filesystem writes. GitHub Issue delivery
+is enabled only when the existing repository, token, and GitHub CLI requirements are available.
+
+The **Case Library** reads existing `manifest.json` files and opens each case with the Challenge first.
+Decision and answer sections require an explicit reveal, and Persian Markdown is presented RTL.
+**Validation** invokes the same validator as `pm-case-lab validate`.
+
+Local UI generation writes cases/history exactly like the local CLI; it never commits or pushes Git
+changes. The independent GitHub Actions workflow remains manual-only and performs its existing
+generated-artifact commit, push, and Issue-delivery steps when launched from GitHub.
+
+During a real run, the page reports backend-confirmed stages with timestamps: selection, research,
+evidence checks, scoring, synthesis, quality validation, publishing, history, and optional Issue
+delivery. Model attempts and the full UI run have configurable time limits, so a failure reaches a
+visible terminal state instead of leaving the page indefinitely busy. An invalid structured model
+response receives one fresh attempt when call budget remains; both attempts count against
+`MAX_AGENT_RUNS`.
 
 ## Commands
 
@@ -170,5 +212,5 @@ See [the architecture contract](docs/architecture.md) for the full state machine
 
 Evidence-driven extensions include independent URL/content verification, RSS and public-transcript
 adapters, human approval, semantic duplicate embeddings, platform trace graders, cost dashboards, and
-additional output languages. A frontend, database, queue, paid search, and scraping remain intentionally
-out of scope.
+additional output languages. A database, queue, paid search, and scraping remain intentionally out of
+scope.

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 import uuid
 from datetime import date
 
@@ -13,6 +14,7 @@ from .gateway import AgentBudgetExceeded, AgentGateway, OpenAIAgentGateway
 from .history import append_history, duplicate_reason, load_history
 from .logging_utils import redact
 from .models import GenerationResult, HistoryRecord, ResearchPacket
+from .progress import ProgressCallback, emit_progress
 from .publisher import publish_case
 from .quality import evaluate_quality
 from .scoring import researched_score, with_score
@@ -52,17 +54,67 @@ class DailyCaseOrchestrator:
         company_override: str | None = None,
         dry_run: bool = False,
         deliver_issue: bool = False,
+        progress_callback: ProgressCallback | None = None,
     ) -> GenerationResult:
+        def progress(
+            event: str,
+            stage: str,
+            status: str,
+            message: str,
+            *,
+            company_id: str | None = None,
+            candidate_slug: str | None = None,
+            attempt: int | None = None,
+            elapsed_ms: int | None = None,
+        ) -> None:
+            emit_progress(
+                progress_callback,
+                event=event,
+                stage=stage,
+                status=status,  # type: ignore[arg-type]
+                message=message,
+                run_id=self.run_id,
+                run_date=run_date,
+                company_id=company_id,
+                candidate_slug=candidate_slug,
+                attempt=attempt,
+                elapsed_ms=elapsed_ms,
+            )
+
         catalog_path = self.settings.data_dir / "company_catalog.yaml"
         history_path = self.settings.data_dir / "history.jsonl"
         companies = load_catalog(catalog_path)
         history = load_history(history_path)
+        progress(
+            "config.validated",
+            "configuration",
+            "completed",
+            (
+                f"Configuration validated; loaded {len(companies)} companies and "
+                f"{len(history)} history records."
+            ),
+        )
+        selection_started = time.monotonic()
+        progress(
+            "company.selection.started",
+            "company-selection",
+            "started",
+            "Selecting the company shortlist.",
+        )
         if company_override:
             shortlist = [resolve_company(companies, company_override)]
         else:
             shortlist = shortlist_companies(
                 companies, history, run_date, self.settings.max_case_candidates
             )
+        progress(
+            "company.selection.completed",
+            "company-selection",
+            "completed",
+            "Company shortlist selected: " + ", ".join(company.name for company in shortlist),
+            company_id=shortlist[0].id if len(shortlist) == 1 else None,
+            elapsed_ms=round((time.monotonic() - selection_started) * 1000),
+        )
         if dry_run:
             return GenerationResult(
                 status="dry_run",
@@ -82,6 +134,13 @@ class DailyCaseOrchestrator:
             }
             for record in history[-30:]
         ]
+        candidate_started = time.monotonic()
+        progress(
+            "candidate.selection.started",
+            "candidate-selection",
+            "started",
+            "Researching and ranking candidate cases.",
+        )
         scout_result = await self.gateway.scout(shortlist, history_summary, run_date)
         allowed_ids = {company.id for company in shortlist}
         candidates = [
@@ -91,6 +150,13 @@ class DailyCaseOrchestrator:
         ]
         candidates.sort(key=lambda candidate: candidate.score.total, reverse=True)
         candidates = candidates[: self.settings.max_case_candidates]
+        progress(
+            "candidate.selection.completed",
+            "candidate-selection",
+            "completed",
+            f"Selected {len(candidates)} non-duplicate candidate case(s).",
+            elapsed_ms=round((time.monotonic() - candidate_started) * 1000),
+        )
         attempted = 0
         last_quality_score: int | None = None
         last_company: str | None = None
@@ -103,6 +169,16 @@ class DailyCaseOrchestrator:
             best_total = -1
             prior_packet: ResearchPacket | None = None
             for pass_number in range(1, self.settings.max_research_passes + 1):
+                research_started = time.monotonic()
+                progress(
+                    "research.started",
+                    "research",
+                    "started",
+                    f"Research pass {pass_number} started for {candidate.company_name}.",
+                    company_id=candidate.company_id,
+                    candidate_slug=candidate.case_slug,
+                    attempt=pass_number,
+                )
                 try:
                     packet = await self.gateway.research(candidate, pass_number, prior_packet)
                 except AgentBudgetExceeded:
@@ -113,6 +189,26 @@ class DailyCaseOrchestrator:
                         agent_runs=self.gateway.runs_used,
                         message="Agent call budget exhausted before a case passed quality gates.",
                     )
+                progress(
+                    "research.completed",
+                    "research",
+                    "completed",
+                    f"Research pass {pass_number} returned {len(packet.sources)} sources.",
+                    company_id=candidate.company_id,
+                    candidate_slug=candidate.case_slug,
+                    attempt=pass_number,
+                    elapsed_ms=round((time.monotonic() - research_started) * 1000),
+                )
+                evidence_started = time.monotonic()
+                progress(
+                    "evidence.validation.started",
+                    "evidence-validation",
+                    "started",
+                    "Validating source IDs and evidence integrity.",
+                    company_id=candidate.company_id,
+                    candidate_slug=candidate.case_slug,
+                    attempt=pass_number,
+                )
                 if (
                     packet.candidate.company_id != candidate.company_id
                     or packet.candidate.case_slug != candidate.case_slug
@@ -124,6 +220,15 @@ class DailyCaseOrchestrator:
                             "stage": "research-validation",
                             "status": "rejected",
                         },
+                    )
+                    progress(
+                        "evidence.validation.rejected",
+                        "evidence-validation",
+                        "rejected",
+                        "Research packet did not match the selected candidate.",
+                        company_id=candidate.company_id,
+                        candidate_slug=candidate.case_slug,
+                        attempt=pass_number,
                     )
                     break
                 try:
@@ -138,9 +243,48 @@ class DailyCaseOrchestrator:
                             "status": "rejected",
                         },
                     )
+                    progress(
+                        "evidence.validation.rejected",
+                        "evidence-validation",
+                        "rejected",
+                        f"Evidence validation rejected pass {pass_number}: {exc}",
+                        company_id=candidate.company_id,
+                        candidate_slug=candidate.case_slug,
+                        attempt=pass_number,
+                    )
                     continue
+                progress(
+                    "evidence.validation.completed",
+                    "evidence-validation",
+                    "completed",
+                    "Evidence integrity checks completed.",
+                    company_id=candidate.company_id,
+                    candidate_slug=candidate.case_slug,
+                    attempt=pass_number,
+                    elapsed_ms=round((time.monotonic() - evidence_started) * 1000),
+                )
+                scoring_started = time.monotonic()
+                progress(
+                    "candidate.scoring.started",
+                    "candidate-scoring",
+                    "started",
+                    "Scoring the researched candidate.",
+                    company_id=candidate.company_id,
+                    candidate_slug=candidate.case_slug,
+                    attempt=pass_number,
+                )
                 score = researched_score(candidate, packet)
                 packet.candidate = with_score(candidate, score)
+                progress(
+                    "candidate.scoring.completed",
+                    "candidate-scoring",
+                    "completed",
+                    f"Candidate research score: {score.total}/100.",
+                    company_id=candidate.company_id,
+                    candidate_slug=candidate.case_slug,
+                    attempt=pass_number,
+                    elapsed_ms=round((time.monotonic() - scoring_started) * 1000),
+                )
                 if score.total > best_total:
                     best_packet, best_total = packet, score.total
                 prior_packet = packet
@@ -157,6 +301,15 @@ class DailyCaseOrchestrator:
                     break
             if best_packet is None:
                 continue
+            synthesis_started = time.monotonic()
+            progress(
+                "case.generation.started",
+                "case-generation",
+                "started",
+                "Generating the case study and independent review.",
+                company_id=candidate.company_id,
+                candidate_slug=candidate.case_slug,
+            )
             try:
                 study = await self.gateway.synthesize(best_packet)
                 reviewer = await self.gateway.review(best_packet, study)
@@ -168,6 +321,24 @@ class DailyCaseOrchestrator:
                     agent_runs=self.gateway.runs_used,
                     message="Agent call budget exhausted before synthesis/review completed.",
                 )
+            progress(
+                "case.generation.completed",
+                "case-generation",
+                "completed",
+                "Case synthesis and review completed.",
+                company_id=candidate.company_id,
+                candidate_slug=candidate.case_slug,
+                elapsed_ms=round((time.monotonic() - synthesis_started) * 1000),
+            )
+            quality_started = time.monotonic()
+            progress(
+                "quality.validation.started",
+                "quality-validation",
+                "started",
+                "Running deterministic quality and spoiler checks.",
+                company_id=candidate.company_id,
+                candidate_slug=candidate.case_slug,
+            )
             quality = evaluate_quality(
                 packet=best_packet,
                 study=study,
@@ -176,6 +347,15 @@ class DailyCaseOrchestrator:
                 history=history,
             )
             if not quality.publishable:
+                progress(
+                    "quality.validation.rejected",
+                    "quality-validation",
+                    "rejected",
+                    f"Candidate scored {quality.score}/100 and did not pass all hard checks.",
+                    company_id=candidate.company_id,
+                    candidate_slug=candidate.case_slug,
+                    elapsed_ms=round((time.monotonic() - quality_started) * 1000),
+                )
                 last_quality_score = quality.score
                 last_company = candidate.company_name
                 last_blockers = quality.blockers
@@ -194,6 +374,25 @@ class DailyCaseOrchestrator:
                 )
                 continue
 
+            progress(
+                "quality.validation.completed",
+                "quality-validation",
+                "completed",
+                f"Quality gate passed at {quality.score}/100.",
+                company_id=candidate.company_id,
+                candidate_slug=candidate.case_slug,
+                elapsed_ms=round((time.monotonic() - quality_started) * 1000),
+            )
+            publishing_started = time.monotonic()
+            progress(
+                "publishing.started",
+                "publishing",
+                "started",
+                "Publishing Markdown and JSON case artifacts.",
+                company_id=candidate.company_id,
+                candidate_slug=candidate.case_slug,
+            )
+
             final_path, manifest = publish_case(
                 cases_dir=self.settings.cases_dir,
                 run_date=run_date,
@@ -201,6 +400,15 @@ class DailyCaseOrchestrator:
                 study=study,
                 quality=quality,
                 model=self.settings.openai_model,
+            )
+            progress(
+                "publishing.completed",
+                "publishing",
+                "completed",
+                "Case artifacts published locally.",
+                company_id=candidate.company_id,
+                candidate_slug=candidate.case_slug,
+                elapsed_ms=round((time.monotonic() - publishing_started) * 1000),
             )
             record = HistoryRecord(
                 date=run_date,
@@ -213,14 +421,50 @@ class DailyCaseOrchestrator:
                 difficulty=best_packet.candidate.difficulty,
                 sources_count=len(best_packet.sources),
             )
+            history_started = time.monotonic()
+            progress(
+                "history.update.started",
+                "history-update",
+                "started",
+                "Updating duplicate-protection history.",
+                company_id=candidate.company_id,
+                candidate_slug=candidate.case_slug,
+            )
             append_history(history_path, record)
+            progress(
+                "history.update.completed",
+                "history-update",
+                "completed",
+                "History updated.",
+                company_id=candidate.company_id,
+                candidate_slug=candidate.case_slug,
+                elapsed_ms=round((time.monotonic() - history_started) * 1000),
+            )
             issue_url = None
             if deliver_issue:
                 if not self.settings.github_repository:
                     raise RuntimeError("PM_CASE_GITHUB_REPOSITORY is required with --deliver-issue")
                 repository_relative_path = final_path.relative_to(self.settings.root_dir)
+                issue_started = time.monotonic()
+                progress(
+                    "issue.delivery.started",
+                    "issue-delivery",
+                    "started",
+                    "Creating the GitHub Issue.",
+                    company_id=candidate.company_id,
+                    candidate_slug=candidate.case_slug,
+                )
                 issue_url = GitHubIssueDelivery(self.settings.github_repository).deliver(
                     repository_relative_path, manifest
+                )
+                progress(
+                    "issue.delivery.completed",
+                    "issue-delivery",
+                    "completed",
+                    "GitHub Issue created.",
+                    company_id=candidate.company_id,
+                    candidate_slug=candidate.case_slug,
+                    elapsed_ms=round((time.monotonic() - issue_started) * 1000),
                 )
             return GenerationResult(
                 status="published",

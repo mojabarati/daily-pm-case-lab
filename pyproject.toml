@@ -10,11 +10,13 @@ dependencies = [
   "pydantic-settings>=2.10,<3",
   "python-dotenv>=1.1,<2",
   "pyyaml>=6.0.2,<7",
+  "streamlit>=1.49,<2",
   "tzdata>=2025.2",
 ]
 
 [project.scripts]
 pm-case-lab = "daily_pm_case_lab.cli:main"
+pm-case-ui = "daily_pm_case_lab.ui.launcher:main"
 
 [dependency-groups]
 dev = [

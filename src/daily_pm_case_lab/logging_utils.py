@@ -35,12 +35,18 @@ class JsonFormatter(logging.Formatter):
             "message": record.getMessage(),
         }
         for key in (
+            "event",
             "run_id",
+            "run_date",
             "stage",
             "attempt",
+            "retry_attempt",
             "duration_ms",
+            "elapsed_ms",
             "model",
             "agent_runs",
+            "company_id",
+            "candidate_slug",
             "tool_calls",
             "input_tokens",
             "output_tokens",

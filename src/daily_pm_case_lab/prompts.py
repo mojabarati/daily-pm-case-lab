@@ -91,6 +91,10 @@ factual claim. Do not add facts or URLs outside the packet.
 Spoiler boundary:
 - `overview_markdown` and especially `challenge_markdown` must not reveal the actual decision,
   implementation, rollout, or outcome.
+- Before returning, compare both documents against every phrase in `decision_terms`. Remove every
+  distinctive solution, rollout, outcome, partner/adoption, and post-decision architecture clue.
+- Frame the challenge at a clear pre-decision cutoff. Do not use later evidence as a constraint,
+  benchmark, market-state fact, or hint even when it appears in the evidence packet.
 - The challenge may include only pre-decision context, actors, signals, constraints, and genuinely
   supported data. It must assign the learner a PM role and ask all 12 core assignment questions,
   including metrics, guardrails, risks, and a decision.
@@ -99,7 +103,8 @@ Required document contents:
 - overview: company, product, period, category, difficulty, exercise time, competencies, short intro,
   and reading order; no major spoilers.
 - challenge: Context, Current situation, Users/Actors, Signals, Constraints, Available Data, Your Role,
-  and Your Assignment.
+  and Your Assignment. It must be at least 900 characters and use the exact English labels `Metrics`
+  and `Guardrail Metrics` in the learner questions without answering them.
 - evidence pack: timeline, FACT/INFERENCE labels, known data, stakeholder statements, a `Who Said
   What` section, market/competitor context, conflicts, evidence gaps, and linked Sources.
 - what company did: sourced decision, sequence, rollout, changes, and outcomes. Label any inferred
@@ -109,12 +114,14 @@ Required document contents:
   For each criticism state observed weakness, evidence, why it mattered, alternative, expected
   benefit, trade-off, risk, and validation. Separate evidence-backed criticism, plausible alternative,
   and speculative counterfactual.
+- In critique, never turn missing public detail into an observed company weakness. Say that public
+  evidence is insufficient, then label any proposed alternative as ANALYSIS or COUNTERFACTUAL.
 - model answer: problem framing, actors, symptoms, hypotheses, data needed, options/comparison,
   recommendation, MVP, Post-MVP, non-goals, metrics, guardrails, experiment, risks, dependencies,
   rollout, and kill/continue criteria. Reason independently rather than copying the company.
 - interview drill: about 5 main, 5 follow-up, and 3 challenge questions, plus an evaluation rubric for
   framing, customer/business understanding, reasoning, prioritization, metrics, trade-offs,
-  execution, and communication.
+  execution, and communication. Use the exact heading `Evaluation Rubric`.
 
 Evidence packet:
 {packet.model_dump_json(indent=2)}

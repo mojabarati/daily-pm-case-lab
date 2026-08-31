@@ -5,7 +5,7 @@ import time
 from datetime import date
 from typing import Protocol, TypeVar
 
-from agents import Agent, Runner, WebSearchTool
+from agents import Agent, ModelBehaviorError, ModelSettings, Runner, WebSearchTool
 from pydantic import BaseModel
 
 from .config import Settings
@@ -81,12 +81,6 @@ class OpenAIAgentGateway:
         web_search: bool,
         max_turns: int,
     ) -> OutputT:
-        if self._runs_used >= self.settings.max_agent_runs:
-            raise AgentBudgetExceeded(
-                f"MAX_AGENT_RUNS={self.settings.max_agent_runs} exhausted before {stage}"
-            )
-        self._runs_used += 1
-        attempt = self._runs_used
         tools = [WebSearchTool()] if web_search else []
         agent: Agent[None] = Agent(
             name=f"Daily PM Case Lab — {stage}",
@@ -94,53 +88,105 @@ class OpenAIAgentGateway:
             model=self.settings.openai_model,
             tools=tools,
             output_type=output_type,
+            model_settings=ModelSettings(timeout=self.settings.model_timeout_seconds),
         )
-        started = time.monotonic()
-        try:
-            result = await Runner.run(agent, prompt, max_turns=max_turns)
-        except Exception as exc:
-            LOGGER.exception(
-                "agent stage failed",
+        stage_attempt = 0
+        while True:
+            if self._runs_used >= self.settings.max_agent_runs:
+                raise AgentBudgetExceeded(
+                    f"MAX_AGENT_RUNS={self.settings.max_agent_runs} exhausted before {stage}"
+                )
+            self._runs_used += 1
+            attempt = self._runs_used
+            stage_attempt += 1
+            started = time.monotonic()
+            LOGGER.info(
+                "agent stage started",
+                extra={
+                    "event": "agent.started",
+                    "run_id": self.run_id,
+                    "stage": stage,
+                    "attempt": attempt,
+                    "retry_attempt": stage_attempt,
+                    "model": self.settings.openai_model,
+                    "agent_runs": self._runs_used,
+                    "status": "started",
+                },
+            )
+            try:
+                result = await Runner.run(agent, prompt, max_turns=max_turns)
+                final = result.final_output
+                parsed = (
+                    final if isinstance(final, output_type) else output_type.model_validate(final)
+                )
+            except ModelBehaviorError as exc:
+                duration_ms = round((time.monotonic() - started) * 1000)
+                can_retry = stage_attempt < 2 and self._runs_used < self.settings.max_agent_runs
+                LOGGER.log(
+                    logging.WARNING if can_retry else logging.ERROR,
+                    "agent stage returned invalid structured output; retrying"
+                    if can_retry
+                    else "agent stage failed",
+                    extra={
+                        "event": "agent.retrying" if can_retry else "agent.failed",
+                        "run_id": self.run_id,
+                        "stage": stage,
+                        "attempt": attempt,
+                        "retry_attempt": stage_attempt,
+                        "duration_ms": duration_ms,
+                        "model": self.settings.openai_model,
+                        "agent_runs": self._runs_used,
+                        "status": "retrying" if can_retry else "failed",
+                        "error_type": type(exc).__name__,
+                    },
+                )
+                if can_retry:
+                    continue
+                raise
+            except Exception as exc:
+                LOGGER.exception(
+                    "agent stage failed",
+                    extra={
+                        "run_id": self.run_id,
+                        "stage": stage,
+                        "attempt": attempt,
+                        "retry_attempt": stage_attempt,
+                        "duration_ms": round((time.monotonic() - started) * 1000),
+                        "model": self.settings.openai_model,
+                        "agent_runs": self._runs_used,
+                        "status": "failed",
+                        "event": "agent.failed",
+                        "error_type": type(exc).__name__,
+                    },
+                )
+                raise
+
+            input_tokens = output_tokens = tool_calls = 0
+            for response in getattr(result, "raw_responses", []):
+                usage = getattr(response, "usage", None)
+                input_tokens += int(getattr(usage, "input_tokens", 0) or 0)
+                output_tokens += int(getattr(usage, "output_tokens", 0) or 0)
+                for item in getattr(response, "output", []):
+                    item_type = str(getattr(item, "type", ""))
+                    tool_calls += int("tool" in item_type or "search_call" in item_type)
+            LOGGER.info(
+                "agent stage completed",
                 extra={
                     "run_id": self.run_id,
                     "stage": stage,
                     "attempt": attempt,
+                    "retry_attempt": stage_attempt,
                     "duration_ms": round((time.monotonic() - started) * 1000),
                     "model": self.settings.openai_model,
                     "agent_runs": self._runs_used,
-                    "status": "failed",
-                    "error_type": type(exc).__name__,
+                    "tool_calls": tool_calls,
+                    "input_tokens": input_tokens,
+                    "output_tokens": output_tokens,
+                    "status": "completed",
+                    "event": "agent.completed",
                 },
             )
-            raise
-
-        input_tokens = output_tokens = tool_calls = 0
-        for response in getattr(result, "raw_responses", []):
-            usage = getattr(response, "usage", None)
-            input_tokens += int(getattr(usage, "input_tokens", 0) or 0)
-            output_tokens += int(getattr(usage, "output_tokens", 0) or 0)
-            for item in getattr(response, "output", []):
-                item_type = str(getattr(item, "type", ""))
-                tool_calls += int("tool" in item_type or "search_call" in item_type)
-        LOGGER.info(
-            "agent stage completed",
-            extra={
-                "run_id": self.run_id,
-                "stage": stage,
-                "attempt": attempt,
-                "duration_ms": round((time.monotonic() - started) * 1000),
-                "model": self.settings.openai_model,
-                "agent_runs": self._runs_used,
-                "tool_calls": tool_calls,
-                "input_tokens": input_tokens,
-                "output_tokens": output_tokens,
-                "status": "completed",
-            },
-        )
-        final = result.final_output
-        if isinstance(final, output_type):
-            return final
-        return output_type.model_validate(final)
+            return parsed
 
     async def scout(
         self,

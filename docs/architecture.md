@@ -22,7 +22,8 @@ Success means that a published case:
 
 ## Constraints and decisions
 
-- Python 3.12+ and `uv`; no frontend, database, queue, cache, vector store, or extra SaaS.
+- Python 3.12+, `uv`, and a local Streamlit presentation layer; no separate frontend/backend,
+  database, queue, cache, vector store, or extra SaaS.
 - OpenAI Agents SDK over the Responses API. The default model is configurable and starts at `gpt-5.6-terra`, the balanced GPT-5.6 model; production owners can override `OPENAI_MODEL` after evals.
 - Hosted `WebSearchTool` is the only MVP research integration. No scraping and no claim that multimedia was reviewed beyond the recorded access level.
 - Deterministic Python owns orchestration, budgets, scoring, validation, filesystem writes, history, and delivery. Models propose researched structured data and educational prose; they do not control loops or side effects.
@@ -32,8 +33,8 @@ Success means that a published case:
 ## Runtime flow
 
 ```text
-CLI / GitHub Actions
-        |
+CLI / Local Streamlit UI / GitHub Actions
+                  |
         v
 Config + catalog/history validation
         |
@@ -166,9 +167,11 @@ Environment limits:
 - `MAX_RESEARCH_PASSES=3`
 - `MAX_SOURCES=12`
 - `MAX_AGENT_RUNS=12`
+- `OPENAI_MODEL_TIMEOUT_SECONDS=600` (per model attempt)
+- `GENERATION_TIMEOUT_SECONDS=2700` (end-to-end local UI run)
 - `OPENAI_MODEL=gpt-5.6-terra`
 
-The call budget is checked before every SDK run. Research passes and candidate attempts are fixed loops. No agent is allowed to recursively hand off or schedule more work. Logs record stage, attempt, duration, model/tool-call counts, token usage when exposed, outcome, and sanitized error class.
+The call budget is checked before every SDK run. Research passes and candidate attempts are fixed loops. A schema/structured-output `ModelBehaviorError` receives at most one fresh attempt when budget remains, and that attempt consumes the same global call budget. No agent is allowed to recursively hand off or schedule more work. Logs record stage, attempt, retry attempt, duration, model/tool-call counts, token usage when exposed, outcome, and sanitized error class.
 
 ## Failure behavior
 
@@ -192,6 +195,17 @@ CLI commands:
 
 `GitHubIssueDelivery` uses GitHub's CLI with `GITHUB_TOKEN`/Actions permissions and an explicit repository. It sends only a concise case summary and repository-relative links; it never includes credentials or large generated content.
 
+## Local web UI
+
+The Streamlit UI is a presentation layer over the existing Python services. A thin adapter discovers
+case manifests safely, combines catalog and history data for read-only coverage views, sanitizes
+system status, and invokes `DailyCaseOrchestrator.generate` and `validate_case_directory` directly.
+It does not reproduce candidate selection, research, scoring, quality, publication, or history rules.
+
+The browser receives rendered case content and safe status fields, never credential values. The case
+reader conditionally renders spoiler sections only after an explicit reveal. Local generation has the
+same filesystem behavior as the CLI and performs no automatic Git commit or push.
+
 ## Manual GitHub Actions execution
 
 GitHub Actions runs only through `workflow_dispatch`. The optional `company` input accepts a catalog company ID, name, or alias; when it is empty, the application performs its normal automatic catalog selection. Workflow concurrency permits one non-cancelling run at a time. The workflow installs `uv`, syncs the locked environment, runs the generator, commits only generated case/history changes, pushes, and creates the optional Issue using the repository token.
@@ -209,4 +223,4 @@ GitHub Actions runs only through `workflow_dispatch`. The optional `company` inp
 
 ## Post-MVP
 
-Potential extensions, justified only by observed needs: richer URL-content verification, RSS and public transcript adapters, manual reviewer approvals, semantic duplicate embeddings, platform eval datasets/trace graders, cost dashboards, and multi-language output. Paid search, brittle scraping, a database, and a frontend remain out of scope until evidence supports them.
+Potential extensions, justified only by observed needs: richer URL-content verification, RSS and public transcript adapters, manual reviewer approvals, semantic duplicate embeddings, platform eval datasets/trace graders, cost dashboards, and multi-language output. Paid search, brittle scraping, and a database remain out of scope until evidence supports them.
