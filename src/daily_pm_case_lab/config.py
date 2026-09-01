@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     max_research_passes: int = Field(default=3, ge=1, le=5, alias="MAX_RESEARCH_PASSES")
     max_sources: int = Field(default=12, ge=5, le=20, alias="MAX_SOURCES")
     max_agent_runs: int = Field(default=12, ge=3, le=30, alias="MAX_AGENT_RUNS")
+    max_revision_passes: int = Field(default=2, ge=0, le=3, alias="MAX_REVISION_PASSES")
     model_timeout_seconds: float = Field(
         default=600, ge=30, le=1800, alias="OPENAI_MODEL_TIMEOUT_SECONDS"
     )

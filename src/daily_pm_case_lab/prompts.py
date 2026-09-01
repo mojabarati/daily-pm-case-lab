@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from datetime import date
 
-from .models import CaseCandidate, CaseStudy, Company, ResearchPacket
+from .models import CaseCandidate, CaseStudy, Company, ResearchPacket, ReviewerReport
 
 EVIDENCE_POLICY = """
 Evidence policy:
@@ -95,9 +95,15 @@ Spoiler boundary:
   distinctive solution, rollout, outcome, partner/adoption, and post-decision architecture clue.
 - Frame the challenge at a clear pre-decision cutoff. Do not use later evidence as a constraint,
   benchmark, market-state fact, or hint even when it appears in the evidence packet.
+- A later-published source may support post-decision documents, but it must not be used to claim
+  what the learner or company knew at the cutoff. Exclude retrospective investigations, filings,
+  outcomes, and later descriptions from the challenge unless a source dated on or before the cutoff
+  directly establishes contemporaneous availability.
 - The challenge may include only pre-decision context, actors, signals, constraints, and genuinely
   supported data. It must assign the learner a PM role and ask all 12 core assignment questions,
   including metrics, guardrails, risks, and a decision.
+- Label any causal mechanism, behavioral expectation, or marketplace consequence as INFERENCE or
+  ANALYSIS unless the packet directly supports that exact relationship as a FACT.
 
 Required document contents:
 - overview: company, product, period, category, difficulty, exercise time, competencies, short intro,
@@ -118,13 +124,24 @@ Required document contents:
   evidence is insufficient, then label any proposed alternative as ANALYSIS or COUNTERFACTUAL.
 - model answer: problem framing, actors, symptoms, hypotheses, data needed, options/comparison,
   recommendation, MVP, Post-MVP, non-goals, metrics, guardrails, experiment, risks, dependencies,
-  rollout, and kill/continue criteria. Reason independently rather than copying the company.
+  rollout, and kill/continue criteria. Reason independently rather than copying the company. Define
+  every primary metric and guardrail operationally; state the baseline/comparison, evaluation window,
+  segmentation, and explicit threshold-setting logic. When public evidence does not justify a numeric
+  threshold, label the number as a scenario assumption and explain how a PM would calibrate it.
 - interview drill: about 5 main, 5 follow-up, and 3 challenge questions, plus an evaluation rubric for
   framing, customer/business understanding, reasoning, prioritization, metrics, trade-offs,
   execution, and communication. Use the exact heading `Evaluation Rubric`.
 
 Evidence packet:
 {packet.model_dump_json(indent=2)}
+
+Final pre-return self-check (non-negotiable): infer one explicit decision cutoff from the candidate
+and evidence. In `overview_markdown` and `challenge_markdown`, remove every citation whose source
+publication date is after that cutoff, without exception. Do not use a later source even to
+reconstruct earlier mechanics or competitive context. If contemporaneous evidence is insufficient,
+state that the learner does not know the fact; never fill the gap with hindsight. Then verify the
+model answer contains operational definitions, comparison baseline, evaluation window, segmentation,
+and calibrated kill/continue threshold logic.
 """
 
 
@@ -149,6 +166,47 @@ Generated case:
 """
 
 
+def revision_prompt(
+    packet: ResearchPacket,
+    study: CaseStudy,
+    reviewer: ReviewerReport,
+) -> str:
+    return f"""
+Revise the seven Persian learning documents using only the same evidence packet. Resolve every
+reviewer blocker, unsupported claim, spoiler finding, and analytical-depth issue. Do not argue with
+the review and do not add new facts, sources, or invented specificity.
+
+Revision rules:
+- Treat every item in `blockers`, `unsupported_claims`, and `spoiler_findings` as a
+  literal edit checklist. Locate the quoted or paraphrased wording in every document and remove it
+  completely or replace it with the reviewer's supported wording. Do not merely add a qualification
+  elsewhere.
+- For unsupported descriptions of what the company did, chose, rejected, intended, or caused,
+  delete the unsupported clause. Do not preserve it as ANALYSIS, a working assumption, or a softer
+  binary contrast. Use only the narrowest wording directly supported by the evidence packet.
+- Relabel only learner-authored proposals and forward-looking reasoning as working assumptions,
+  hypotheses, ANALYSIS, or COUNTERFACTUAL; labels cannot rescue an unsupported historical claim.
+- Preserve the strict pre-decision cutoff and remove all post-cutoff citations from overview/challenge.
+- Keep all required headings, minimum depth, exact source IDs, and the two-phase spoiler boundary.
+- Treat every numeric sample size, threshold, duration, dependency, actor need, and operational
+  constraint as a provisional scenario assumption unless directly evidenced.
+- Make experiment baselines, windows, metric definitions, segmentation, and threshold calibration
+  executable without presenting proposed values as company facts.
+- Before returning, perform a final search across all seven documents for every phrase and semantic
+  claim named by the reviewer. The revised draft is invalid if any unsupported meaning remains,
+  including through words such as `rather than`, `instead of`, `rejected`, `abandoned`, or `caused`.
+
+Evidence packet:
+{packet.model_dump_json(indent=2)}
+
+Current draft:
+{study.model_dump_json(indent=2)}
+
+Reviewer report to resolve completely:
+{reviewer.model_dump_json(indent=2)}
+"""
+
+
 SCOUT_INSTRUCTIONS = """You are the Case Scout for a product-management learning system. Use hosted
 web search before returning schema-valid candidates. Follow the evidence and duplicate constraints
 literally. Do not write the final case."""
@@ -163,3 +221,8 @@ IDs. Unknowns remain explicit."""
 
 REVIEW_INSTRUCTIONS = """You are an adversarial evidence reviewer and senior PM. Fail unsupported,
 spoiled, shallow, or hindsight-driven cases. Return only the structured review."""
+
+REVISION_INSTRUCTIONS = """You are a senior Persian-language PM editor. Correct every reviewer
+finding using only the supplied evidence. Treat the report as a literal edit checklist: remove each
+unsupported historical claim instead of defending, relabeling, or preserving its meaning. Preserve
+the spoiler boundary and return the complete seven-document structured case."""

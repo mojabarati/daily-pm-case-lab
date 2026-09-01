@@ -20,10 +20,12 @@ from .models import (
 from .prompts import (
     RESEARCH_INSTRUCTIONS,
     REVIEW_INSTRUCTIONS,
+    REVISION_INSTRUCTIONS,
     SCOUT_INSTRUCTIONS,
     SYNTHESIS_INSTRUCTIONS,
     research_prompt,
     review_prompt,
+    revision_prompt,
     scout_prompt,
     synthesis_prompt,
 )
@@ -57,6 +59,13 @@ class AgentGateway(Protocol):
     async def synthesize(self, packet: ResearchPacket) -> CaseStudy: ...
 
     async def review(self, packet: ResearchPacket, study: CaseStudy) -> ReviewerReport: ...
+
+    async def revise(
+        self,
+        packet: ResearchPacket,
+        study: CaseStudy,
+        reviewer: ReviewerReport,
+    ) -> CaseStudy: ...
 
 
 class OpenAIAgentGateway:
@@ -234,6 +243,21 @@ class OpenAIAgentGateway:
             instructions=REVIEW_INSTRUCTIONS,
             prompt=review_prompt(packet, study),
             output_type=ReviewerReport,
+            web_search=False,
+            max_turns=5,
+        )
+
+    async def revise(
+        self,
+        packet: ResearchPacket,
+        study: CaseStudy,
+        reviewer: ReviewerReport,
+    ) -> CaseStudy:
+        return await self._run(
+            stage="revision",
+            instructions=REVISION_INSTRUCTIONS,
+            prompt=revision_prompt(packet, study, reviewer),
+            output_type=CaseStudy,
             web_search=False,
             max_turns=5,
         )

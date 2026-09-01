@@ -167,11 +167,12 @@ Environment limits:
 - `MAX_RESEARCH_PASSES=3`
 - `MAX_SOURCES=12`
 - `MAX_AGENT_RUNS=12`
+- `MAX_REVISION_PASSES=2`
 - `OPENAI_MODEL_TIMEOUT_SECONDS=600` (per model attempt)
 - `GENERATION_TIMEOUT_SECONDS=2700` (end-to-end local UI run)
 - `OPENAI_MODEL=gpt-5.6-terra`
 
-The call budget is checked before every SDK run. Research passes and candidate attempts are fixed loops. A schema/structured-output `ModelBehaviorError` receives at most one fresh attempt when budget remains, and that attempt consumes the same global call budget. No agent is allowed to recursively hand off or schedule more work. Logs record stage, attempt, retry attempt, duration, model/tool-call counts, token usage when exposed, outcome, and sanitized error class.
+The call budget is checked before every SDK run. Research passes, candidate attempts, and reviewer-guided revision passes are fixed loops. A rejected draft may receive up to `MAX_REVISION_PASSES` corrections using the same evidence packet and exact reviewer findings; each revision receives a fresh independent review and must pass the unchanged deterministic gate. A schema/structured-output `ModelBehaviorError` receives at most one fresh attempt when budget remains, and that attempt consumes the same global call budget. No agent is allowed to recursively hand off or schedule more work. Logs record stage, attempt, retry attempt, duration, model/tool-call counts, token usage when exposed, outcome, and sanitized error class.
 
 ## Failure behavior
 

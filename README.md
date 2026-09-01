@@ -57,6 +57,7 @@ Configuration:
 | `MAX_RESEARCH_PASSES` | `3` | Research retries per candidate |
 | `MAX_SOURCES` | `12` | Maximum sources returned in a packet |
 | `MAX_AGENT_RUNS` | `12` | Absolute SDK-call budget per command |
+| `MAX_REVISION_PASSES` | `2` | Maximum reviewer-guided draft correction cycles |
 | `OPENAI_MODEL_TIMEOUT_SECONDS` | `600` | Maximum time for one Agents SDK model attempt |
 | `GENERATION_TIMEOUT_SECONDS` | `2700` | Maximum end-to-end UI generation time |
 | `PM_CASE_LOG_LEVEL` | `INFO` | structured-log level |
@@ -103,7 +104,8 @@ evidence checks, scoring, synthesis, quality validation, publishing, history, an
 delivery. Model attempts and the full UI run have configurable time limits, so a failure reaches a
 visible terminal state instead of leaving the page indefinitely busy. An invalid structured model
 response receives one fresh attempt when call budget remains; both attempts count against
-`MAX_AGENT_RUNS`.
+`MAX_AGENT_RUNS`. A rejected draft can receive up to `MAX_REVISION_PASSES` evidence-preserving
+revisions; every revision is independently reviewed and must pass the unchanged hard gate.
 
 ## Commands
 

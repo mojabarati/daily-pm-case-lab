@@ -346,6 +346,63 @@ class DailyCaseOrchestrator:
                 candidate_score=best_packet.candidate.score.total,
                 history=history,
             )
+            for revision_number in range(1, self.settings.max_revision_passes + 1):
+                if quality.publishable:
+                    break
+                remaining_runs = self.settings.max_agent_runs - self.gateway.runs_used
+                if remaining_runs < 2:
+                    break
+                progress(
+                    "quality.validation.rejected",
+                    "quality-validation",
+                    "rejected",
+                    (
+                        f"Draft scored {quality.score}/100; starting bounded reviewer-guided "
+                        f"revision {revision_number}/{self.settings.max_revision_passes}."
+                    ),
+                    company_id=candidate.company_id,
+                    candidate_slug=candidate.case_slug,
+                    elapsed_ms=round((time.monotonic() - quality_started) * 1000),
+                )
+                revision_started = time.monotonic()
+                progress(
+                    "case.revision.started",
+                    "case-revision",
+                    "started",
+                    f"Revision {revision_number}: correcting every reviewer finding.",
+                    company_id=candidate.company_id,
+                    candidate_slug=candidate.case_slug,
+                    attempt=revision_number,
+                )
+                try:
+                    study = await self.gateway.revise(best_packet, study, reviewer)
+                    reviewer = await self.gateway.review(best_packet, study)
+                except AgentBudgetExceeded:
+                    return GenerationResult(
+                        status="budget_exhausted",
+                        selected_company=candidate.company_name,
+                        attempted_candidates=attempted,
+                        agent_runs=self.gateway.runs_used,
+                        message="Agent call budget exhausted during reviewer-guided revision.",
+                    )
+                quality = evaluate_quality(
+                    packet=best_packet,
+                    study=study,
+                    reviewer=reviewer,
+                    candidate_score=best_packet.candidate.score.total,
+                    history=history,
+                )
+                progress(
+                    "case.revision.completed",
+                    "case-revision",
+                    "completed",
+                    f"Revision {revision_number} re-reviewed at {quality.score}/100.",
+                    company_id=candidate.company_id,
+                    candidate_slug=candidate.case_slug,
+                    attempt=revision_number,
+                    elapsed_ms=round((time.monotonic() - revision_started) * 1000),
+                )
+                quality_started = time.monotonic()
             if not quality.publishable:
                 progress(
                     "quality.validation.rejected",

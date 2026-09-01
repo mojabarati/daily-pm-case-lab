@@ -42,6 +42,10 @@ class FakeGateway:
         self._runs += 1
         return reviewer()
 
+    async def revise(self, research_packet, generated_study, reviewer_report):
+        self._runs += 1
+        return study()
+
 
 @pytest.mark.asyncio
 async def test_offline_full_orchestration_publishes_and_updates_history(tmp_path) -> None:
@@ -88,3 +92,52 @@ async def test_dry_run_makes_no_agent_calls_or_writes(tmp_path) -> None:
     assert result.status == "dry_run"
     assert gateway.runs_used == 0
     assert not (tmp_path / "cases").exists()
+
+
+@pytest.mark.asyncio
+async def test_rejected_draft_gets_bounded_revisions_before_publish(tmp_path) -> None:
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    shutil.copyfile(ROOT / "data" / "company_catalog.yaml", data_dir / "company_catalog.yaml")
+    (data_dir / "history.jsonl").write_text("", encoding="utf-8")
+    settings = Settings(
+        root_dir=tmp_path,
+        openai_api_key="test-only-key",
+        max_case_candidates=1,
+        max_research_passes=1,
+        max_agent_runs=8,
+    )
+
+    class RevisionGateway(FakeGateway):
+        def __init__(self) -> None:
+            super().__init__()
+            self.review_calls = 0
+            self.revision_calls = 0
+
+        async def review(self, research_packet, generated_study):
+            self._runs += 1
+            self.review_calls += 1
+            report = reviewer(score=70 if self.review_calls <= 2 else 88)
+            if self.review_calls <= 2:
+                report.blockers = ["Unsupported draft assumption"]
+            return report
+
+        async def revise(self, research_packet, generated_study, reviewer_report):
+            self._runs += 1
+            self.revision_calls += 1
+            return study()
+
+    gateway = RevisionGateway()
+    progress = []
+    result = await DailyCaseOrchestrator(settings, gateway).generate(
+        run_date=date(2026, 9, 1),
+        company_override="Uber",
+        progress_callback=progress.append,
+    )
+
+    assert result.status == "published"
+    assert gateway.review_calls == 3
+    assert gateway.revision_calls == 2
+    events = [item.event for item in progress]
+    assert events.count("case.revision.started") == 2
+    assert events.index("case.revision.completed") < events.index("publishing.started")

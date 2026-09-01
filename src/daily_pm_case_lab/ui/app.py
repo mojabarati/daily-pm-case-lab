@@ -671,6 +671,7 @@ def _render_system_status(
             {"Setting": "MAX_RESEARCH_PASSES", "Value": status.max_research_passes},
             {"Setting": "MAX_SOURCES", "Value": status.max_sources},
             {"Setting": "MAX_AGENT_RUNS", "Value": status.max_agent_runs},
+            {"Setting": "MAX_REVISION_PASSES", "Value": status.max_revision_passes},
             {
                 "Setting": "OPENAI_MODEL_TIMEOUT_SECONDS",
                 "Value": status.model_timeout_seconds,

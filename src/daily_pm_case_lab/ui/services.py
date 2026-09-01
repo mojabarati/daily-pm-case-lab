@@ -94,6 +94,7 @@ class SystemStatus:
     max_research_passes: int
     max_sources: int
     max_agent_runs: int
+    max_revision_passes: int
     model_timeout_seconds: float
     generation_timeout_seconds: float
     github_repository_configured: bool
@@ -318,6 +319,7 @@ def build_system_status(
         max_research_passes=settings.max_research_passes,
         max_sources=settings.max_sources,
         max_agent_runs=settings.max_agent_runs,
+        max_revision_passes=settings.max_revision_passes,
         model_timeout_seconds=settings.model_timeout_seconds,
         generation_timeout_seconds=settings.generation_timeout_seconds,
         github_repository_configured=bool(settings.github_repository),
