@@ -1,0 +1,14 @@
+{
+  "date": "2026-09-01",
+  "company": "Twilio",
+  "case_title": "Making SMS-pumping protection automatic without blocking real users",
+  "case_slug": "making-sms-pumping-protection-automatic",
+  "category": "Trust and safety / API product design",
+  "difficulty": "Advanced",
+  "source_count": 8,
+  "primary_source_count": 8,
+  "quality_score": 87,
+  "generated_at": "2026-09-01T19:09:59.374844+03:30",
+  "model": "gpt-5.6-terra",
+  "status": "published"
+}

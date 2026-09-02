@@ -1,0 +1,225 @@
+{
+  "sources": [
+    {
+      "id": "S01",
+      "type": "Official product changelog",
+      "title": "Verify Automatic SMS Fraud Detection is in Beta",
+      "publisher": "Twilio",
+      "author": null,
+      "speaker": null,
+      "speaker_role": null,
+      "url": "https://www.twilio.com/en-us/changelog/verify-automatic-sms-fraud-detection-is-in-beta",
+      "published_at": "2022-07-25",
+      "accessed_at": "2026-09-01",
+      "is_primary": true,
+      "content_access_level": "partial_transcript_reviewed",
+      "credibility_score": 91,
+      "relevant_sections": [
+        "Beta release announcement",
+        "Claim that the feature works automatically at no additional cost",
+        "Reported pilot ranges: up to 35% daily-spend reduction and doubled conversion in certain countries"
+      ],
+      "timestamps": [],
+      "used_for": [
+        "Chronology",
+        "Early rollout",
+        "Pilot outcome claims"
+      ]
+    },
+    {
+      "id": "S02",
+      "type": "Official product-launch blog",
+      "title": "Twilio Verify’s Automatic SMS Fraud Detection is now in Public Beta",
+      "publisher": "Twilio",
+      "author": "Nader Attar",
+      "speaker": "Nader Attar",
+      "speaker_role": "Twilio blog author; author bio describes him as a product-management veteran",
+      "url": "https://www.twilio.com/en-us/blog/products/launches/announcing-automatic-sms-fraud-detection-public-beta",
+      "published_at": "2022-09-06",
+      "accessed_at": "2026-09-01",
+      "is_primary": true,
+      "content_access_level": "partial_transcript_reviewed",
+      "credibility_score": 90,
+      "relevant_sections": [
+        "Public-beta announcement",
+        "Description of SMS traffic pumping",
+        "Limited-customer pilot",
+        "Named but anonymized large social-media customer example",
+        "Console enablement and no-additional-cost positioning"
+      ],
+      "timestamps": [],
+      "used_for": [
+        "Problem signal",
+        "Launch chronology",
+        "Pilot design evidence",
+        "Customer outcome claim",
+        "Pricing and configuration"
+      ]
+    },
+    {
+      "id": "S03",
+      "type": "Official developer blog",
+      "title": "Reduce OTP Fraud with Twilio Verify’s Fraud Detection",
+      "publisher": "Twilio",
+      "author": "Michael Piccirilli",
+      "speaker": "Michael Piccirilli",
+      "speaker_role": "Data science leader, according to author bio",
+      "url": "https://www.twilio.com/en-us/blog/developers/best-practices/verify-otp-fraud-detection",
+      "published_at": "2022-07-14",
+      "accessed_at": "2026-09-01",
+      "is_primary": true,
+      "content_access_level": "partial_transcript_reviewed",
+      "credibility_score": 88,
+      "relevant_sections": [
+        "SMS-pumping mechanism",
+        "Pre-existing customer-side mitigations: rate limits, geo permissions, bot controls",
+        "Automatic AI-driven detection description",
+        "False-positive framing",
+        "Early claimed spend and conversion ranges"
+      ],
+      "timestamps": [],
+      "used_for": [
+        "Problem signal",
+        "Pre-decision alternatives",
+        "Detection approach",
+        "Early outcome claims",
+        "False-positive constraint"
+      ]
+    },
+    {
+      "id": "S04",
+      "type": "Official product documentation",
+      "title": "Verify Fraud Guard",
+      "publisher": "Twilio Docs",
+      "author": null,
+      "speaker": null,
+      "speaker_role": null,
+      "url": "https://www.twilio.com/docs/verify/preventing-toll-fraud/sms-fraud-guard",
+      "published_at": null,
+      "accessed_at": "2026-09-01",
+      "is_primary": true,
+      "content_access_level": "partial_transcript_reviewed",
+      "credibility_score": 94,
+      "relevant_sections": [
+        "Current and historical traffic analysis and destination-prefix blocking",
+        "Basic, Standard, and Max protection levels",
+        "Safe List, RiskCheck, and geo-permission controls",
+        "Email alerts, Verify Logs, error 60410, and Fraud Insights metrics"
+      ],
+      "timestamps": [],
+      "used_for": [
+        "Technical and operational mechanism",
+        "Customer configuration",
+        "False-positive mitigation",
+        "Observability",
+        "Current product state"
+      ]
+    },
+    {
+      "id": "S05",
+      "type": "Official investor-relations prepared remarks",
+      "title": "Q2 2023 Prepared Remarks - FINAL",
+      "publisher": "Twilio Investor Relations",
+      "author": null,
+      "speaker": "Khozema Shipchandler",
+      "speaker_role": "President, Twilio Communications",
+      "url": "https://investors.twilio.com/static-files/9fa39db9-e450-4f25-b9bb-c2a8f551305a",
+      "published_at": "2023-08-08",
+      "accessed_at": "2026-09-01",
+      "is_primary": true,
+      "content_access_level": "partial_transcript_reviewed",
+      "credibility_score": 94,
+      "relevant_sections": [
+        "Communications business remarks",
+        "AI/ML in core Communications products",
+        "Fraud Guard identified as a release",
+        "Fraud Guard described as instrumental to an expansion deal"
+      ],
+      "timestamps": [],
+      "used_for": [
+        "Business relevance",
+        "Company framing of product rollout",
+        "Commercial adoption signal"
+      ]
+    },
+    {
+      "id": "S06",
+      "type": "Official legal terms",
+      "title": "Verify Fraud Guard",
+      "publisher": "Twilio Legal",
+      "author": null,
+      "speaker": null,
+      "speaker_role": null,
+      "url": "https://www.twilio.com/en-us/legal/service-country-specific-terms/verify-fraud-guard",
+      "published_at": "2024-07-10",
+      "accessed_at": "2026-09-01",
+      "is_primary": true,
+      "content_access_level": "partial_transcript_reviewed",
+      "credibility_score": 97,
+      "relevant_sections": [
+        "Fraud Guard Promise",
+        "Max Protection Mode requirement",
+        "Thirty-day claim window and Twilio review",
+        "Credit eligibility",
+        "Exclusion when Geo Permissions, Safe List, or RiskCheck are enabled on affected numbers"
+      ],
+      "timestamps": [],
+      "used_for": [
+        "Risk-sharing decision",
+        "Customer-economics terms",
+        "Interaction between overrides and detection performance"
+      ]
+    },
+    {
+      "id": "S07",
+      "type": "Official developer/product guidance",
+      "title": "Preventing SMS Pumping Fraud: A Guide to Our Protective Offerings",
+      "publisher": "Twilio",
+      "author": "Estefany Añasco and Kelley Robinson",
+      "speaker": "Estefany Añasco and Kelley Robinson",
+      "speaker_role": "Twilio blog authors",
+      "url": "https://www.twilio.com/en-us/blog/developers/best-practices/sms-pumping-protection-options",
+      "published_at": "2024-08-08",
+      "accessed_at": "2026-09-01",
+      "is_primary": true,
+      "content_access_level": "partial_transcript_reviewed",
+      "credibility_score": 89,
+      "relevant_sections": [
+        "Why protection was built directly into the Verify API",
+        "Protection-level trade-offs and stated false-positive ranges",
+        "Included-in-Verify pricing",
+        "Relationship to Lookup SMS Pumping Risk Score and Programmable Messaging protection"
+      ],
+      "timestamps": [],
+      "used_for": [
+        "2024 product configuration",
+        "False-positive trade-off",
+        "Product-line and market context"
+      ]
+    },
+    {
+      "id": "S08",
+      "type": "Annual report / investor-relations report",
+      "title": "Twilio annual-report material reporting AI product metrics",
+      "publisher": "Twilio Investor Relations",
+      "author": null,
+      "speaker": null,
+      "speaker_role": null,
+      "url": "https://investors.twilio.com/static-files/d19ba297-193c-4a92-b9cb-ce9a17f55c60",
+      "published_at": null,
+      "accessed_at": "2026-09-01",
+      "is_primary": true,
+      "content_access_level": "partial_transcript_reviewed",
+      "credibility_score": 93,
+      "relevant_sections": [
+        "AI products and features metrics page",
+        "Footnote defining 569M+ blocks and $62.7M+ explicit savings from June 2022 through October 2024"
+      ],
+      "timestamps": [],
+      "used_for": [
+        "Cumulative outcome claim",
+        "Outcome measurement period"
+      ]
+    }
+  ]
+}
